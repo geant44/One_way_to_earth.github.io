@@ -65,7 +65,7 @@ headers=['TOWNID','oldpeopletotal']
 with open('oldpeopledata.csv','w') as f:
     writedCsv = csv.DictWriter(f, headers)
     writedCsv.writeheader()
-    writedCsv.writerows(rows)
+    writedCsv.writerows(res)
 print('finished')
 
 
