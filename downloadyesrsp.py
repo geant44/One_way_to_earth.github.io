@@ -9,6 +9,7 @@ Original file is located at
 
 import pandas as pd
 import json
+import csv
 import requests
 
 #json_url = 'http://data.moi.gov.tw/MoiOD/System/DownloadFile.aspx?DATA=22CFBCD7-63BB-4E58-ADF3-B50BFE55ECED'
@@ -59,7 +60,12 @@ for cur, val in result:
     else:
         # else create a new key/value pair in the dictionary.
         res[cur] = val
-        
-print('finish')
+
+headers=['TOWNID','oldpeopletotal']
+with open('oldpeopledata.csv','w') as f:
+    writedCsv = csv.DictWriter(f, headers)
+    writedCsv.writeheader()
+    writedCsv.writerows(rows)
+print('finished')
 
 
