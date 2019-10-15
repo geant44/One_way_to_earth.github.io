@@ -23,7 +23,7 @@ data = requests.get(json_url)
 
 result = []
 json_url_noy = 'https://www.ris.gov.tw/rs-opendata/api/v1/datastore/ODRP014/'
-for data_years in [i for i in range(10704,10809)]:
+for data_years in [ str(y)+"{:02d}".format(m) for y in range(107,109) for m in range(1,13)]:
   data = requests.get(json_url_noy+str(data_years))
   print('The ',data_years,'is downloading.')
   for page in range(1,int(''.join(i for i in data.text.split(",\n")[2].split(":")[1] if i.isdigit()))+1):
