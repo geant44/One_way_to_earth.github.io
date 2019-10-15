@@ -104,6 +104,12 @@ requirejs(['./WorldWindShim',
         var cityShapefile = new WorldWind.Shapefile(shapefileLibrary + "/ne_50m_populated_places_simple/ne_50m_populated_places_simple.shp");
         cityShapefile.load(null, shapeConfigurationCallback, cityLayer);
         wwd.addLayer(cityLayer);
+        
+        // Create data for Taiwan cities.
+        var twcityLayer = new WorldWind.RenderableLayer("TWCities");
+        var twcityShapefile = new WorldWind.Shapefile("data/COUNTY_MOI_1080726.shp");
+        twcityShapefile.load(null, shapeConfigurationCallback, cityLayer);
+        wwd.addLayer(twcityLayer);
 
         // Create data for Fort Story (Over Virginia Beach, VA. It can be seen near Norfolk.)
         var fortStory = "https://worldwind.arc.nasa.gov/web/examples/data/shapefiles/misc/FortStory/Trident-Spectre-Indigo-i.shp";
