@@ -56,21 +56,10 @@ for data_years in [ str(y)+"{:02d}".format(m) for y in range(107,109) for m in r
     else:
       print('Error page no.')
       
-res={}
-for data_years,district_code,oldpeople in result:
-    if cur in res:
-        # If the currency already exists, add the value to its total
-        res[data_years,district_code] += val
-    else:
-        # else create a new key/value pair in the dictionary.
-        res[data_years,district_code] = val
+tt=pd.DataFrame(result)
+tt.columns=['Date','TOWNID','oldpersion']
+tt.groupby(['Date','TOWNID'])['oldpersion'].aggregate('sum').to_csv('tt.csv')
 
-headers=['TOWNID', 'oldpeopletotal']
-with open('oldpeopledata.csv','w') as f:
-    writedCsv = csv.writer(f)
-    writedCsv.writerow(headers)
-    for key, value in res.items():
-       writedCsv.writerow([key, value])
 print('finished')
 
 
