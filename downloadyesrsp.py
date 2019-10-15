@@ -61,11 +61,12 @@ for cur, val in result:
         # else create a new key/value pair in the dictionary.
         res[cur] = val
 
-headers=['TOWNID','oldpeopletotal']
+headers=['TOWNID', 'oldpeopletotal']
 with open('oldpeopledata.csv','w') as f:
-    writedCsv = csv.DictWriter(f, headers)
-    writedCsv.writeheader()
-    writedCsv.writerows(res)
+    writedCsv = csv.writer(f)
+    writedCsv.writerow(headers)
+    for key, value in res.items():
+       writedCsv.writerow([key, value])
 print('finished')
 
 
