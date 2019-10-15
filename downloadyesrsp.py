@@ -46,20 +46,20 @@ for data_years in [i for i in range(10704,10809)]:
             totaloldf = int(row['people_age_'+'{:03d}'.format(years)+'_f']) + totalf
             totaloldm = int(row['people_age_'+'{:03d}'.format(years)+'_m']) + totalm
           oldpeople = totaloldf + totaoldlm
-          result.append([district_code,oldpeople])
+          result.append([data_years,district_code,oldpeople])
       else:
         print('Error Data no.')
     else:
       print('Error page no.')
       
 res={}
-for cur, val in result:
+for data_years,district_code,oldpeople in result:
     if cur in res:
         # If the currency already exists, add the value to its total
-        res[cur] += val
+        res[data_years,district_code] += val
     else:
         # else create a new key/value pair in the dictionary.
-        res[cur] = val
+        res[data_years,district_code] = val
 
 headers=['TOWNID', 'oldpeopletotal']
 with open('oldpeopledata.csv','w') as f:
