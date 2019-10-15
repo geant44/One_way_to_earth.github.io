@@ -58,7 +58,7 @@ for data_years in [ str(y)+"{:02d}".format(m) for y in range(107,109) for m in r
       
 tt=pd.DataFrame(result)
 tt.columns=['Date','TOWNID','oldpersion']
-tt.groupby(['Date','TOWNID'])['oldpersion'].aggregate('sum').to_csv('tt.csv')
+tt.groupby(['Date','TOWNID'])['oldpersion'].aggregate('sum').to_csv('oldpeopledata.csv')
 
 print('finished')
 
