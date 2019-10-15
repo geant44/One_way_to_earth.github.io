@@ -25,7 +25,11 @@ result = []
 json_url_noy = 'https://www.ris.gov.tw/rs-opendata/api/v1/datastore/ODRP014/'
 for data_years in [ str(y)+"{:02d}".format(m) for y in range(107,109) for m in range(1,13)]:
   data = requests.get(json_url_noy+str(data_years))
-  print('The ',data_years,'is downloading.')
+  if json.loads(data.text)['responseMessage'] == '查無資料':
+    print(data_years,'is not found.')
+    break
+  else:
+    print('The ',data_years,'is downloading.')
   for page in range(1,int(''.join(i for i in data.text.split(",\n")[2].split(":")[1] if i.isdigit()))+1):
     new_url = json_url_noy+str(data_years)+'?page='+str(page)
     #print(new_url)
@@ -43,8 +47,8 @@ for data_years in [ str(y)+"{:02d}".format(m) for y in range(107,109) for m in r
           totaoldlm = 0
           oldpeople = 0
           for years in range(65,100):
-            totaloldf = int(row['people_age_'+'{:03d}'.format(years)+'_f']) + totalf
-            totaloldm = int(row['people_age_'+'{:03d}'.format(years)+'_m']) + totalm
+            totaloldf = int(row['people_age_'+'{:03d}'.format(years)+'_f']) + totaloldf
+            totaoldlm = int(row['people_age_'+'{:03d}'.format(years)+'_m']) + totaoldlm
           oldpeople = totaloldf + totaoldlm
           result.append([data_years,district_code,oldpeople])
       else:
