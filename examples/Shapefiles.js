@@ -108,7 +108,7 @@ requirejs(['./WorldWindShim',
         // Create data for Taiwan cities.
         var twcityLayer = new WorldWind.RenderableLayer("TWCities");
         var twcityShapefile = new WorldWind.Shapefile("data/COUNTY_MOI_1080726.shp");
-        twcityShapefile.load(null, shapeConfigurationCallback, cityLayer);
+        twcityShapefile.load(null, shapeConfigurationCallback, twcityLayer);
         wwd.addLayer(twcityLayer);
 
         // Create data for Fort Story (Over Virginia Beach, VA. It can be seen near Norfolk.)
