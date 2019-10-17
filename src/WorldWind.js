@@ -214,6 +214,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         './geom/Sector',
         './shapes/ShapeAttributes',
         './formats/shapefile/Shapefile',
+		'./formats/shapefile/DBaseFile',
         './layer/ShowTessellationLayer',
         './shaders/SkyProgram',
         './layer/StarFieldLayer',
@@ -492,6 +493,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
               Sector,
               ShapeAttributes,
               Shapefile,
+			  DBaseFile,
               ShowTessellationLayer,
               SkyProgram,
               StarFieldLayer,
@@ -1007,6 +1009,7 @@ define([ // PLEASE KEEP ALL THIS IN ALPHABETICAL ORDER BY MODULE NAME (not direc
         WorldWind['Sector'] = Sector;
         WorldWind['ShapeAttributes'] = ShapeAttributes;
         WorldWind['Shapefile'] = Shapefile;
+		WorldWind['DBaseFile'] = DBaseFile;
         WorldWind['ShowTessellationLayer'] = ShowTessellationLayer;
         WorldWind['SkyProgram'] = SkyProgram;
         WorldWind['StarFieldLayer'] = StarFieldLayer;
