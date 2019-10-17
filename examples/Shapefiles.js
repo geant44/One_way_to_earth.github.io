@@ -72,7 +72,7 @@ requirejs(['./WorldWindShim',
                     configuration.attributes.imageScale = 0.01 * Math.log(population);
                 }
             } else if (record.isPolygonType()) { // Configure polygon-based features (countries, in this example).
-                configuration.attributes = new WorldWind.ShapeAttributes(null);
+				configuration.attributes = new WorldWind.ShapeAttributes(null);
 
                 // Fill the polygon with a random pastel color.
                 configuration.attributes.interiorColor = new WorldWind.Color(
@@ -111,6 +111,14 @@ requirejs(['./WorldWindShim',
         var twcityShapefile = new WorldWind.Shapefile("data/COUNTY_MOI_1080726.shp");
         twcityShapefile.load(null, shapeConfigurationCallback, twcityLayer);
         wwd.addLayer(twcityLayer);
+		
+		// Create data for Taiwan town.
+        var twtownLayer = new WorldWind.RenderableLayer("TWTown");
+        var twtownShapefile = new WorldWind.Shapefile("data/TOWN_MOI_1080726.shp");
+		var twtownDBFile = new WorldWind.DBaseFile("data/TOWN_MOI_1080726.dbf");
+        twtownShapefile.load(null, shapeConfigurationCallback, twtownLayer);
+		twtownDBFile.getFields()
+        wwd.addLayer(twtownLayer);
 
         // Create data for Fort Story (Over Virginia Beach, VA. It can be seen near Norfolk.)
         var fortStory = "https://worldwind.arc.nasa.gov/web/examples/data/shapefiles/misc/FortStory/Trident-Spectre-Indigo-i.shp";
