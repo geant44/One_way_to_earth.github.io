@@ -57,9 +57,12 @@ for data_years in [ str(y)+"{:02d}".format(m) for y in range(107,109) for m in r
       print('Error page no.')
       
 tt=pd.DataFrame(result)
-tt.columns=['Date','TOWNID','oldpersion']
-tt.groupby(['Date','TOWNID'])['oldpersion'].aggregate('sum').to_csv('oldpeopledata.csv')
-
+#tt.columns=['Date','TOWNID','oldpersion']
+tt.columns=['Date','TOWNID','p']
+#tt.groupby(['Date','TOWNID'])['oldpersion'].aggregate('sum').to_csv('oldpeopledata.csv')
+tt.groupby(['Date','TOWNID'])['p'].aggregate('sum')
+#tt.to_csv('oldpeopledata.csv')
+tt.to_json('oldpeopledata.json')
 print('finished')
 
 
