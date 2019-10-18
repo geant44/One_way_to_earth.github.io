@@ -72,8 +72,14 @@ requirejs(['./WorldWindShim',
                     configuration.attributes.imageScale = 0.01 * Math.log(population);
                 }
             } else if (record.isPolygonType()) { // Configure polygon-based features (countries, in this example).
+				configuration.TOWNCODE = attributes.values.TOWNCODE
 				configuration.attributes = new WorldWind.ShapeAttributes(null);
 
+                //if (attributes.values.TOWNCODE) {
+                //    var population = attributes.values.TOWNCODE;
+                //    configuration.attributes.imageScale = 0.01 * Math.log(population);
+                //}
+				
                 // Fill the polygon with a random pastel color.
                 configuration.attributes.interiorColor = new WorldWind.Color(
                     0.375 + 0.5 * Math.random(),
@@ -104,7 +110,8 @@ requirejs(['./WorldWindShim',
         var cityLayer = new WorldWind.RenderableLayer("Cities");
         var cityShapefile = new WorldWind.Shapefile(shapefileLibrary + "/ne_50m_populated_places_simple/ne_50m_populated_places_simple.shp");
         cityShapefile.load(null, shapeConfigurationCallback, cityLayer);
-        wwd.addLayer(cityLayer);
+        console.log(cityShapefile)
+		wwd.addLayer(cityLayer);
         
         // Create data for Taiwan cities.
         var twcityLayer = new WorldWind.RenderableLayer("TWCities");
@@ -115,9 +122,21 @@ requirejs(['./WorldWindShim',
 		// Create data for Taiwan town.
         var twtownLayer = new WorldWind.RenderableLayer("TWTown");
         var twtownShapefile = new WorldWind.Shapefile("data/TOWN_MOI_1080726.shp");
-		var twtownDBFile = new WorldWind.DBaseFile("data/TOWN_MOI_1080726.dbf");
+		//var twtownDBFile = new WorldWind.DBaseFile("data/TOWN_MOI_1080726.dbf");
         twtownShapefile.load(null, shapeConfigurationCallback, twtownLayer);
-		twtownDBFile.getFields()
+		//twtownDBFile.load();
+		twtownShapefile.attributeFile.getFields()
+		//twtownDBFile.readHeader(0)
+		//twtownDBFile.parse()
+		//var FieldList = [ ];
+		//twtownDBFile.getFields(FieldList)
+		//var FieldInfo = twtownDBFile.parse(0)
+		//console.log(twtownDBFile)
+		console.log(twtownShapefile)
+		//console.log(twtownDBFile.readFieldDescriptors(twtownDBFile._buffer,"TOWNCODE"))
+		//console.log(twtownDBFile.getLastModificationDate())
+		//console.log(twtownDBFile.getNumberOfRecords(twtownDBFileload))
+		//console.log(twtownDBFile.readFieldDescriptors());
         wwd.addLayer(twtownLayer);
 
         // Create data for Fort Story (Over Virginia Beach, VA. It can be seen near Norfolk.)
@@ -165,4 +184,8 @@ requirejs(['./WorldWindShim',
 		
         // Create a layer manager for controlling layer visibility.
         var layerManager = new LayerManager(wwd);
+		
+		//chage TW position
+		//layerManager.goToAnimator.goTo(new WorldWind.Location(latitude, longitude));
+		layerManager.goToAnimator.goTo(new WorldWind.Location( 25.105497, 121.597366));
     });
