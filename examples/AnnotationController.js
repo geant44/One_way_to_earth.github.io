@@ -1,351 +1,295 @@
 /*
- * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
- * National Aeronautics and Space Administration. All rights reserved.
- *
- * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Copyright (C) 2014 United States Government as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All Rights Reserved.
  */
-define(function () {
+define(['./USGS', './Draw', './Control', './WorldPoint'], function(USGS, Draw, control, WorldPoint) {
     "use strict";
 
-    /**
-     * Constructs an annotation controller for a specified {@link WorldWindow}.
-     * @alias AnnotationController
-     * @constructor
-     * @classdesc Provides an annotation controller to interactively update DOM elements corresponding to a
-     * specific annotation
-     * @param {WorldWindow} worldWindow The WorldWindow to associate this annotation controller with. Used
-     * mainly for redrawing the wwd globe after changing settings.
-     */
-    var AnnotationController = function (worldWindow) {
 
-        var self = this;
-
-        /**
-         * The WorldWindow associated with this annotation controller.
-         * @type {WorldWindow}
-         */
+    var AnnotationController = function(worldWindow, queryParameters, control) {
         this.worldWindow = worldWindow;
 
-        // Store the loaded annotation so we may read/modify
-        // its settings
-        this.currentAnnotation = null;
-
-        // Store DOM slider elements
+        this.magSlider = $("#magSlider");
+        this.dateSlider = $("#dateSlider");
         this.opacitySlider = $("#opacitySlider");
-        this.scaleSlider = $("#scaleSlider");
-        this.cornerSlider = $("#cornerSlider");
-        this.leadWidthSlider = $("#leadWidthSlider");
-        this.leadHeightSlider = $("#leadHeightSlider");
-        this.backgroundR = $("#bgR");
-        this.backgroundG = $("#bgG");
-        this.backgroundB = $("#bgB");
-        this.textR = $("#textR");
-        this.textG = $("#textG");
-        this.textB = $("#textB");
 
-        // Store DOM spinner elements for the insets
-        this.spinnerLeft = $("#spinnerLeft");
-        this.spinnerRight = $("#spinnerRight");
-        this.spinnerTop = $("#spinnerTop");
-        this.spinnerBottom = $("#spinnerBottom");
-
-        // Store DOM input elements
-        this.text = $("#annotationText");
-
-        // Store DOM label elements
-        this.bgColorLabel = $("#bgColor");
-        this.textColorLabel = $("#textColor");
-        this.opacityLabel = $("#opacity");
-        this.scaleLabel = $("#scale");
-        this.cornerRadiusLabel = $("#cornerRadius");
-        this.leaderGapLabel = $("#leadSize");
-
-        // Create an event for the textbox so that we may update the
-        // annotation's label as the textbox contents change
-        this.text.on('input', function (e) {
-            self.currentAnnotation.text = this.value;
-            self.worldWindow.redraw();
+        // var firstTime = true;
+        this.drawingSelector = $("#drawingSelection");
+        var drawingSelector = this.drawingSelector;
+        this.drawingSelector.on("change", function() {
+            // if (firstTime) {
+            //     alert("Double Click to select points");
+            //     firstTime = false;
+            // }
+            control.setDrawMode(drawingSelector.val());
         });
+
+        function update() {
+            populateLegend();
+            control.redraw();
+        }
+
+
+        // this.drawRectangle = $("#drawRectangle").on("click", function () {
+        //     control.setDrawMode("rectangle");
+        // });
+        //
+        // this.drawCircle = $("#drawCricle").on("click", function () {
+        //     control.setDrawMode("circle");
+        // });
+        //
+        // this.drawOff = $("#drawOff").on("click", function () {
+        //     control.setDrawMode("off");
+        // });
+
+        this.coloringMode = $("#coloringMode");
+        var coloringMode = this.coloringMode;
+        this.coloringMode.on("change", function() {
+            control.setColoringMode(coloringMode.val());
+            updateLegend(coloringMode.val());
+            update();
+        });
+
+        function populateLegend() {
+            var fromDate = new Date(queryParameters.FromDate);
+            var toDate = new Date(queryParameters.ToDate);
+            var interval = new Date(toDate - fromDate);
+
+            var percent = [0.1, 0.3, 0.6, 1];
+            for (var i in percent) {
+                var ageRanges = document.getElementById('agerange' + i);
+                var middle = new Date(toDate);
+                middle.setDate(middle.getDate() - interval.getDate()*percent[i]);
+                var dd = middle.getDate();
+                var mm = middle.getMonth() + 1;
+                var y = middle.getYear() - 100;
+                ageRanges.textContent = '<' + y + '-' + mm + '-' + dd;
+            }
+        }
+
+        function updateLegend(value) {
+            $('#ageLegendTable').toggle();
+            $('#MagnitudeLegendTable').toggle();
+        }
+
+        this.depthSlider = $("#depthSlider");
+
+        this.FromDate = $("#fromdatepicker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
+            yearRange: "1925:nn",
+            dateFormat: "yy-mm-dd",
+            onSelect: function(dateText, dateobj) {
+                queryParameters.setFromDate(dateText);
+                update();
+            }
+        });
+
+        this.ToDate = $("#todatepicker").datepicker({
+            changeMonth: true,
+            changeYear: true,
+            showButtonPanel: true,
+            yearRange: "1925:nn",
+            dateFormat: "yy-mm-dd",
+            onSelect: function(dateText, dateobj) {
+                queryParameters.setToDate(dateText);
+                update();
+            }
+        });
+
+        this.magSlider.slider({
+            range: true,
+            values: [4, 10.0],
+            min: 0.0,
+            max: 10.0,
+            step: 0.1,
+            animate: true,
+            slide: function(event, ui) {
+                $("#magSliderValue").html(ui.values[0].toString() + " to " +
+                    ui.values[1].toString() + " Richter");
+
+            },
+            stop: function(event, ui) {
+                queryParameters.setMinMagnitude(ui.values[0]);
+                queryParameters.setMaxMagnitude(ui.values[1]);
+                update();
+            }
+
+        });
+
+        this.depthSlider.slider({
+            range: true,
+            values: [0, 1000],
+            min: 0,
+            max: 1000,
+            step: 1,
+            animate: true,
+            slide: function(event, ui) {
+                $("#depthSliderValue").html(ui.values[0].toString() + " to " +
+                    ui.values[1].toString() + " KM");
+            },
+
+            stop: function(event, ui) {
+                queryParameters.setMinDepth(ui.values[0]);
+                queryParameters.setMaxDepth(ui.values[1]);
+                update();
+            }
+        });
+
 
         this.opacitySlider.slider({
-            value: 0,
-            min: 0,
-            max: 1,
-            step: 0.1,
+            value: 50,
+            // min:     0,
+            // max:     100,
+            // step:    5,
             animate: true,
-            slide: function (event, ui) {
-                $("#opacity").html(ui.value);
-                self.currentAnnotation.attributes.opacity = ui.value;
+            slide: function(event, ui) {
+                $("#opacitySliderValue").html(ui.value.toString() + "% opacity");
+            },
+            stop: function(event, ui) {
+                control.setOpacity(ui.value / 100);
             }
         });
 
-        this.scaleSlider.slider({
-            value: 1,
-            min: 0.70,
-            max: 2,
-            step: 0.1,
-            animate: true,
-            slide: function (event, ui) {
-                $("#scale").html(ui.value);
-                self.currentAnnotation.attributes.scale = ui.value;
+        this.limitset = $("#limitSet").on("click", function() {
+            var limit = document.getElementById("limit").value;
+            if (limit > 20000) {
+                alert("Can not query beyond 20,000 events");
+            } else {
+                queryParameters.setLimit(limit);
+                update();
             }
         });
 
-        this.cornerSlider.slider({
-            value: 1,
-            min: 0,
-            max: 30,
-            step: 1,
-            animate: true,
-            slide: function (event, ui) {
-                $("#cornerRadius").html(ui.value);
-                self.currentAnnotation.attributes.cornerRadius = ui.value;
-            }
+        this.setCoordinate = function (point) {
+            document.getElementById("coordSearch").value = point.Lati.toFixed(3).toString() + ',' + point.Long.toFixed(3).toString();
+        };
+
+        this.radiusSearch = $("#searchRadius").on("click", function() {
+            var origin = document.getElementById("coordSearch").value;
+            var radius = document.getElementById("radiusKMSearch").value;
+            control.setDrawMode("radialSearch");
+            queryParameters.setoriginlong(origin.split(",")[0]);
+            queryParameters.setoriginlati(origin.split(",")[1]);
+            queryParameters.setradius(radius);
+            control.FancyLookAt(origin);
+            update();
         });
 
-        // Width value of the lead (arrow)
-        this.leadWidthSlider.slider({
-            //value: 40,
-            min: 0,
-            max: 70,
-            step: 1,
-            animate: true,
-            slide: function (event, ui) {
-                self.changeLeadSize(
-                    self.leadWidthSlider.slider('value'),
-                    self.leadHeightSlider.slider('value'));
-            }
+        this.rightclickhandler = function(event) {
+            var point = control.rightclickpoint;
+            var x = event.clientX,
+                y = event.clientY;
+            point.update3Dfrom2D(x, y);
+            control.updateSelectedPoint(point);
+            var origin = document.getElementById("coordSearch").value;
+            document.getElementById("radiusKMSearch").value = 500;
+            var radius = 500;
+            control.setDrawMode("radialSearch");
+            queryParameters.setoriginlong(origin.split(",")[0]);
+            queryParameters.setoriginlati(origin.split(",")[1]);
+            queryParameters.setradius(radius);
+            control.FancyLookAt(origin);
+            update();
+            // console.log(point);
+        };
+
+        this.reset = $("#reset").on("click", function() {
+            document.index = 0;
+            initializeUI(queryParameters);
+            control.reset();
         });
 
-        // Length value of the lead (arrow)
-        this.leadHeightSlider.slider({
-            //value: 30,
-            min: 0,
-            max: 100,
-            animate: true,
-            slide: function (event, ui) {
-                self.changeLeadSize(
-                    self.leadWidthSlider.slider('value'),
-                    self.leadHeightSlider.slider('value'));
+        var GeoJSONHandler = function(controlGeoJSON) {
+            var GeoJSON = controlGeoJSON;
+            var eqArray = [];
+            for (var i = 0; i < GeoJSON.features.length; i++) {
+                if (GeoJSON.features[i].properties.mag > 4.5) {
+                    eqArray.push(GeoJSON.features[i]);
+                }
             }
-        });
+            return eqArray;
+        };
 
-        // Red value of the background color
-        this.backgroundR.slider({
-            value: 0,
-            min: 0,
-            max: 255,
-            step: 1,
-            animate: true,
-            slide: function (event, ui) {
-                self.changeBackgroundColor(
-                    self.backgroundR.slider('value'),
-                    self.backgroundG.slider('value'),
-                    self.backgroundB.slider('value'));
-            }
-        });
+        this.touringfunctions = function () {
 
-        // Green value of the background color
-        this.backgroundG.slider({
-            value: 0,
-            min: 0,
-            max: 255,
-            animate: true,
-            slide: function (event, ui) {
-                self.changeBackgroundColor(
-                    self.backgroundR.slider('value'),
-                    self.backgroundG.slider('value'),
-                    self.backgroundB.slider('value'));
-            }
-        });
+            document.index = 0;
 
-        // Blue value of the background color
-        this.backgroundB.slider({
-            value: 0,
-            min: 0,
-            max: 255,
-            animate: true,
-            slide: function (event, ui) {
-                self.changeBackgroundColor(
-                    self.backgroundR.slider('value'),
-                    self.backgroundG.slider('value'),
-                    self.backgroundB.slider('value'));
-            }
-        });
+            var tourEventLookAt = function(array, index) {
+                var event = (array[index].geometry.coordinates[1].toString() + "," + array[index].geometry.coordinates[0].toString());
+                control.FancyLookAt(event);
+                control.tourMetadataDisplay(array, index);
+            };
 
-        // Red value of the text color
-        this.textR.slider({
-            value: 0,
-            min: 0,
-            max: 255,
-            animate: true,
-            slide: function (event, ui) {
-                self.changeTextColor(
-                    self.textR.slider('value'),
-                    self.textG.slider('value'),
-                    self.textB.slider('value'));
-            }
-        });
+            this.tourUP = $("#forward").on("click", function () {
+                var highMag = GeoJSONHandler(control.currentGeoJSON);
+                if (document.index === highMag.length) {
+                    document.index = 0;
+                    tourEventLookAt(highMag, document.index);
+                    document.index++;
+                } else {
+                    tourEventLookAt(highMag, document.index);
+                    document.index++;
+                }
+            });
 
-        // Green value of the text color
-        this.textG.slider({
-            value: 0,
-            min: 0,
-            max: 255,
-            animate: true,
-            slide: function (event, ui) {
-                self.changeTextColor(
-                    self.textR.slider('value'),
-                    self.textG.slider('value'),
-                    self.textB.slider('value'));
-            }
-        });
+            this.tourDOWN = $("#backward").on("click", function () {
+                var highMag = GeoJSONHandler(control.currentGeoJSON);
+                if (document.index === 0) {
+                    document.index = highMag.length;
+                    document.index--;
+                    tourEventLookAt(highMag, document.index);
+                } else {
+                    document.index--;
+                    tourEventLookAt(highMag, document.index);
+                }
+            });
+        };
 
-        // Blue value of the text color
-        this.textB.slider({
-            value: 0,
-            min: 0,
-            max: 255,
-            animate: true,
-            slide: function (event, ui) {
-                self.changeTextColor(
-                    self.textR.slider('value'),
-                    self.textG.slider('value'),
-                    self.textB.slider('value'));
-            }
-        });
+        this.touringfunctions();
 
-        // Left inset spinner
-        this.spinnerLeft.spinner({
-            min: 0,
-            max: 100,
-            spin: function (event, ui) {
-                var insets = self.currentAnnotation.attributes.insets.clone();
-                insets.left = ui.value;
-                self.currentAnnotation.attributes.insets = insets;
-                self.worldWindow.redraw();
-            }
-        });
+        function initializeUI() {
+            var initialQuery = queryParameters.initialQuery;
+            //  Pre-populate dropdowns with initial dates
+            $("#fromdatepicker").datepicker("setDate", initialQuery.fromDate.split("T")[0]);
+            $("#todatepicker").datepicker("setDate", initialQuery.toDate.split("T")[0]);
 
-        // Right inset spinner
-        this.spinnerRight.spinner({
-            min: 0,
-            max: 100,
-            spin: function (event, ui) {
-                var insets = self.currentAnnotation.attributes.insets.clone();
-                insets.right = ui.value;
-                self.currentAnnotation.attributes.insets = insets;
-                self.worldWindow.redraw();
-            }
-        });
+            $("#magSlider").slider("option", "values", [initialQuery.minMag, initialQuery.maxMag]);
+            $("#magSliderValue").html($("#magSlider").slider("values", 0).toString() + " to " +
+                $("#magSlider").slider("values", 1).toString() + " Richter");
 
-        // Top inset spinner
-        this.spinnerTop.spinner({
-            min: 0,
-            max: 100,
-            spin: function (event, ui) {
-                var insets = self.currentAnnotation.attributes.insets.clone();
-                insets.top = ui.value;
-                self.currentAnnotation.attributes.insets = insets;
-                self.worldWindow.redraw();
-            }
-        });
+            $("#depthSlider").slider("option", "values", [initialQuery.minDepth, initialQuery.maxDepth]);
+            $("#depthSliderValue").html($("#depthSlider").slider("values", 0).toString() + " to " +
+                $("#depthSlider").slider("values", 1).toString() + " KM");
+            $("#coordSearch").val("");
+            $("#radiusKMSearch").val("");
 
-        // Bottom inset spinner
-        this.spinnerBottom.spinner({
-            min: 0,
-            max: 100,
-            spin: function (event, ui) {
-                var insets = self.currentAnnotation.attributes.insets.clone();
-                insets.bottom = ui.value;
-                self.currentAnnotation.attributes.insets = insets;
-                self.worldWindow.redraw();
-            }
-        });
-    };
+            document.getElementById('limit').value = "";
 
-    // Internal
-    AnnotationController.prototype.changeTextColor = function(r, g, b) {
-        this.textColorLabel.html("RGB(" + r + "," + g + "," + b + ")");
-        this.currentAnnotation.attributes.textAttributes.color = WorldWind.Color.colorFromBytes(r, g, b, 255);
-        this.worldWindow.redraw();
-    };
+            queryParameters.setFromDate(initialQuery.fromDate.split("T")[0]);
+            queryParameters.setToDate(initialQuery.toDate.split("T")[0]);
+            queryParameters.setMinMagnitude(initialQuery.minMag);
+            queryParameters.setMaxMagnitude(initialQuery.maxMag);
+            queryParameters.setMinDepth(initialQuery.minDepth);
+            queryParameters.setMaxDepth(initialQuery.maxDepth);
+            queryParameters.setLimit(initialQuery.limit);
 
-    // Internal
-    AnnotationController.prototype.changeBackgroundColor = function(r, g, b) {
-        this.bgColorLabel.html("RGB(" + r + "," + g + "," + b + ")");
-        this.currentAnnotation.attributes.backgroundColor = WorldWind.Color.colorFromBytes(r, g, b, 255);
-        this.worldWindow.redraw();
-    };
+            drawingSelector[0].selectedIndex = 0;
+            control.setDrawMode(drawingSelector.val());
+            control.setColoringMode(coloringMode.val());
+            populateLegend();
+        }
 
-    // Internal
-    AnnotationController.prototype.changeLeadSize = function(width, height){
-        this.leaderGapLabel.html("width: " + width + " height: " + height);
-        this.currentAnnotation.attributes.leaderGapWidth = width;
-        this.currentAnnotation.attributes.leaderGapHeight = height;
-        this.worldWindow.redraw();
-    };
+        $(document).ready(initializeUI);
 
-    /**
-     * Loads an annotations and adjusts ui controls based on it's settings
-     * @param annotation
-     */
-    AnnotationController.prototype.load = function (annotation) {
-
-        this.currentAnnotation = annotation;
-
-        var bgRed = annotation.attributes.backgroundColor.red * 255,
-            bgGreen = annotation.attributes.backgroundColor.green * 255,
-            bgBlue = annotation.attributes.backgroundColor.blue * 255,
-            textRed = annotation.attributes.textAttributes.color.red * 255,
-            textGreen = annotation.attributes.textAttributes.color.green * 255,
-            textBlue = annotation.attributes.textAttributes.color.blue * 255,
-            leadWidth = annotation.attributes.leaderGapWidth,
-            leadHeight = annotation.attributes.leaderGapHeight;
-
-        // Load background RGB sliders and format label based on values
-        this.backgroundR.slider('value', bgRed);
-        this.backgroundG.slider('value', bgGreen);
-        this.backgroundB.slider('value', bgBlue);
-        this.bgColorLabel.html("RGB(" + bgRed + "," + bgGreen + "," + bgBlue + ")");
-
-        // Load text RGB sliders and format label based on values
-        this.textR.slider('value', textRed);
-        this.textG.slider('value', textGreen);
-        this.textB.slider('value', textBlue);
-        this.textColorLabel.html("RGB(" + textRed + "," + textGreen + "," + textBlue + ")");
-
-        // Load leader size sliders and format label based on values
-        this.leadWidthSlider.slider('value', leadWidth);
-        this.leadHeightSlider.slider('value', leadHeight);
-        this.leaderGapLabel.html("width: " + leadWidth + " height: " + leadHeight);
-
-        // Load sliders settings and adjusts labels with their values
-        this.opacitySlider.slider('value', annotation.attributes.opacity);
-        this.scaleSlider.slider('value', annotation.attributes.scale);
-        this.cornerSlider.slider('value', annotation.attributes.cornerRadius);
-        this.opacityLabel.html(annotation.attributes.opacity);
-        this.scaleLabel.html(annotation.attributes.scale);
-        this.cornerRadiusLabel.html(annotation.attributes.cornerRadius);
-
-        // Load insets values into the spinners
-        this.spinnerBottom.val(annotation.attributes.insets.bottom);
-        this.spinnerTop.val(annotation.attributes.insets.top);
-        this.spinnerLeft.val(annotation.attributes.insets.left);
-        this.spinnerRight.val(annotation.attributes.insets.right);
-
-        //Load and display the text
-        this.text.val(annotation.text);
+        $("#magSliderValue").html(this.magSlider.slider("values", 0).toString() + " to " +
+            this.magSlider.slider("values", 1).toString() + " Richter");
+        $("#depthSliderValue").html(this.depthSlider.slider("values", 0).toString() + " to " +
+            this.depthSlider.slider("values", 1).toString() + " KM");
+        $("#dateSliderValue").html(this.dateSlider.slider("values", 0).toString() + " to " +
+            this.dateSlider.slider("values", 1).toString() + " days");
+        $("#opacitySliderValue").html(this.opacitySlider.slider("value").toString() + "% opacity");
 
     };
 
