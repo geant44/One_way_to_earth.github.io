@@ -106,6 +106,7 @@ function openTabInfo(evt, tabName) {
     // Declare all variables
     var i, tabcontentInfo, tablinksInfo;
 
+    alert("Hello! I am an alert box!!");
     //If the page has just been loaded, Get all elements with class="tabcontentInfo" and hide them
     if (!document.isInit) {
 
@@ -203,6 +204,7 @@ function openRightTabTour(evt, tabName) {
     // Declare all variables
     var i, tabcontentRight, tablinksRight;
 
+    alert("Hey! Wat's up ! Watch Out for the Heat Wave");
     //If the page has just been loaded, Get all elements with class="tabcontentRight" and hide them
     if (!document.isInit) {
 
@@ -277,3 +279,7 @@ function checkNumber(box) {
         alert('Please enter a valid Longitude between 180 and -180');
     }
 }
+
+function getCenter() {
+	layerManager.goToAnimator.goTo(new WorldWind.Location(121.5243741, 25.0258946));
+}	
