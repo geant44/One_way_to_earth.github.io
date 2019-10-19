@@ -86,40 +86,41 @@ requirejs(['./WorldWindShim',
                     0.375 + 0.5 * Math.random(),
                     0.375 + 0.5 * Math.random(),
                     0.0);
-                /*
+
 				if (attributes.values.p) {
 					var oldpopulation = attributes.values.p;
+					var alpha = 0.3;
 					if ( oldpopulation > 10433 ){
-					configuration.attributes.interiorColor = WorldWind.Color.RED;
-					//	configuration.attributes.interiorColor = new WorldWind.Color(
-					//	  0.375 + 0.5 * Math.float(oldpopulation),
-                    //      0.375 + 0.5 * Math.random(),
-                    //      0.375 + 0.5 * Math.random(),
-                    //      1.0);
+					//configuration.attributes.interiorColor = WorldWind.Color.RED;
+					configuration.attributes.interiorColor = new WorldWind.Color(
+					  1,
+                      0,
+                      0,
+                      alpha);
 					} else if (  oldpopulation > 5391 ){
-					configuration.attributes.interiorColor = WorldWind.Color.BLUE;
-					//	configuration.attributes.interiorColor = new WorldWind.Color(
-					//	  0.375 + 0.5 * Math.float(oldpopulation),
-                    //      0.375 + 0.5 * Math.random(),
-                    //      0.375 + 0.5 * Math.random(),
-                    //      1.0);
+					//configuration.attributes.interiorColor = WorldWind.Color.BLUE;
+					configuration.attributes.interiorColor = new WorldWind.Color(
+					  0,
+                      0,
+                      1,
+                      alpha);
 					} else if (  oldpopulation > 2669 ){
-					configuration.attributes.interiorColor = WorldWind.Color.GREEN;
-					//	configuration.attributes.interiorColor = new WorldWind.Color(
-					//	  0.375 + 0.5 * Math.float(oldpopulation),
-                    //      0.375 + 0.5 * Math.random(),
-                    //      0.375 + 0.5 * Math.random(),
-                    //      1.0);
+					//configuration.attributes.interiorColor = WorldWind.Color.GREEN;
+					configuration.attributes.interiorColor = new WorldWind.Color(
+					  0,
+                      1,
+                      0,
+                      alpha);
 					} else {
-					configuration.attributes.interiorColor = WorldWind.Color.WHITE;
-					//	configuration.attributes.interiorColor = new WorldWind.Color(
-					//	  0.375 + 0.5 * Math.float(oldpopulation),
-                    //      0.375 + 0.5 * Math.random(),
-                    //      0.375 + 0.5 * Math.random(),
-                    //      1.0);
+					//configuration.attributes.interiorColor = WorldWind.Color.WHITE;
+					configuration.attributes.interiorColor = new WorldWind.Color(
+					  1,
+                      1,
+                      1,
+                      alpha);
 					}
 				}
-				*/
+
 
                 // Paint the outline in a darker variant of the interior color.
                 configuration.attributes.outlineColor = new WorldWind.Color(
