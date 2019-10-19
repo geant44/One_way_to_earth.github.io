@@ -8,6 +8,7 @@ Original file is located at
 """
 
 import pandas as pd
+import geopandas as gpd
 import json
 import csv
 import requests
@@ -63,6 +64,11 @@ tt.columns=['Date','TOWNID','p']
 tt.groupby(['Date','TOWNID'])['p'].aggregate('sum')
 #tt.to_csv('oldpeopledata.csv')
 tt.to_json('oldpeopledata.json')
+print(tt.describe())
+data = gpd.read_file('TOWN_MOI_1080726.shp',encoding='utf-8')
+data['TOWNCODE']=data['TOWNCODE'].astype(int)
+dataa = data.merge(ff,on='TOWNCODE')
+dataa.to_file('TOWN_MOI_1080726.shp',encoding='utf-8')
 print('finished')
 
 
