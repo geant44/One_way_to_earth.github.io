@@ -85,7 +85,8 @@ requirejs(['./WorldWindShim',
                     0.375 + 0.5 * Math.random(),
                     0.375 + 0.5 * Math.random(),
                     0.375 + 0.5 * Math.random(),
-                    1.0);
+                    0.0);
+                /*
 				if (attributes.values.p) {
 					var oldpopulation = attributes.values.p;
 					if ( oldpopulation > 10433 ){
@@ -118,6 +119,7 @@ requirejs(['./WorldWindShim',
                     //      1.0);
 					}
 				}
+				*/
 
                 // Paint the outline in a darker variant of the interior color.
                 configuration.attributes.outlineColor = new WorldWind.Color(
