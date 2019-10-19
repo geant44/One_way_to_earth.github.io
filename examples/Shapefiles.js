@@ -71,8 +71,8 @@ requirejs(['./WorldWindShim',
                     var population = attributes.values.pop_max;
                     configuration.attributes.imageScale = 0.01 * Math.log(population);
                 }
-            } else if (record.isPolygonType()) { // Configure polygon-based features (countries, in this example).
-				configuration.TOWNCODE = attributes.values.TOWNCODE
+             } else if (record.isPolygonType()) { // Configure polygon-based features (countries, in this example).
+				//configuration.TOWNCODE = attributes.values.TOWNCODE
 				configuration.attributes = new WorldWind.ShapeAttributes(null);
 
                 //if (attributes.values.TOWNCODE) {
@@ -86,7 +86,24 @@ requirejs(['./WorldWindShim',
                     0.375 + 0.5 * Math.random(),
                     0.375 + 0.5 * Math.random(),
                     1.0);
-
+				if (attributes.values.p) {
+					var oldpopulation = attributes.values.p;
+					if ( oldpopulation > 200 ){
+					configuration.attributes.interiorColor = WorldWind.Color.WHITE;
+					//	configuration.attributes.interiorColor = new WorldWind.Color(
+					//	  0.375 + 0.5 * Math.float(oldpopulation),
+                    //      0.375 + 0.5 * Math.random(),
+                    //      0.375 + 0.5 * Math.random(),
+                    //      1.0);
+					} else if (  oldpopulation > 2000 ){
+					configuration.attributes.interiorColor = WorldWind.Color.GREEN;
+					//	configuration.attributes.interiorColor = new WorldWind.Color(
+					//	  0.375 + 0.5 * Math.float(oldpopulation),
+                    //      0.375 + 0.5 * Math.random(),
+                    //      0.375 + 0.5 * Math.random(),
+                    //      1.0);
+					}
+				}
                 // Paint the outline in a darker variant of the interior color.
                 configuration.attributes.outlineColor = new WorldWind.Color(
                     0.5 * configuration.attributes.interiorColor.red,
