@@ -201,6 +201,18 @@ define(['./USGS', './Draw', './Control', './WorldPoint'], function(USGS, Draw, c
             control.reset();
         });
 
+        this. = $("#getCenter").on("click", function() {
+            //var origin = document.getElementById("coordSearch").value;
+            //var radius = document.getElementById("radiusKMSearch").value;
+            //control.setDrawMode("radialSearch");
+            //queryParameters.setoriginlong(origin.split(",")[0]);
+            //queryParameters.setoriginlati(origin.split(",")[1]);
+            //queryParameters.setradius(radius);
+			var origin = 121.5243741, 25.0258946;
+            control.FancyLookAt(origin);
+            update();
+        });
+		
         var GeoJSONHandler = function(controlGeoJSON) {
             var GeoJSON = controlGeoJSON;
             var eqArray = [];
