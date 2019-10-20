@@ -1,3 +1,5 @@
+# The Index file is in examples dir.
+
 <img src="https://worldwind.arc.nasa.gov/img/nasa-logo.svg" height="100"/>
 
 # Web WorldWind
