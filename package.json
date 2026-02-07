@@ -36,7 +36,7 @@
     "grunt-contrib-requirejs": "^1.0.0",
     "grunt-jsdoc": "^2.4.0",
     "grunt-karma": "^4.0.2",
-    "grunt-zip": "^0.18.2",
+    "grunt-zip": "^1.0.0",
     "jasmine-core": "^3.3.0",
     "karma": "^6.4.4",
     "karma-chrome-launcher": "^2.2.0",
